@@ -4,6 +4,8 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.telecom.model.Subscription;
@@ -17,33 +19,53 @@ public class SubscriptionSercviceImpl implements SubscriptionService {
 	private SubscriptionRepository subscriptionRepository;
 
 	@Override
-	public void deleteSubscription(int suscriptionId) {
+	public ResponseEntity<Object> deleteSubscription(int suscriptionId) {
 
-		subscriptionRepository.deleteById(suscriptionId);
-		// TODO Auto-generated method stub
+		Optional<Subscription> data = subscriptionRepository.findById(suscriptionId);
+
+		if (data.isPresent()) {
+
+			subscriptionRepository.deleteById(suscriptionId);
+
+			return ResponseEntity.noContent().build();
+
+		} else {
+
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Id not found");
+
+		}
 
 	}
 
 	@Override
-	public Subscription activateSubscription(int suscriptionId) {
+	public ResponseEntity<Object> activateSubscription(int subscriptionId) {
 
-		Optional<Subscription> optional = subscriptionRepository.findById(suscriptionId);
+		Optional<Subscription> userOptional = subscriptionRepository.findById(subscriptionId);
 
-		if (optional.isPresent()) {
+		if (userOptional.isPresent()) {
 
-			Subscription subscription = optional.get();
+			Subscription user = userOptional.get();
 
-			subscription.setActive(true);
+			if (user.isActive()) {
 
-			Subscription subscription2 = subscriptionRepository.save(subscription);
+				return ResponseEntity.badRequest().body("Subscription is already activated");
 
-			return subscription2;
+			}
 
-		}
+			else {
 
-		else {
+				user.setActive(true);
 
-			return null;
+				subscriptionRepository.save(user);
+
+				return ResponseEntity.ok("Subscription activated successfully");
+
+			}
+
+		} else {
+
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ID is not found");
+
 		}
 
 	}

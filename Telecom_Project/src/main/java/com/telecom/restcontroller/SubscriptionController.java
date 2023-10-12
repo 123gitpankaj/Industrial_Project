@@ -2,6 +2,7 @@ package com.telecom.restcontroller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -17,20 +18,19 @@ public class SubscriptionController {
 	private SubscriptionService subscriptionService;
 
 	@DeleteMapping("/delete/{id}")
-	public void deleteSubscription(@PathVariable("id") int id) {
+	public ResponseEntity<Object> deleteSubscription(@PathVariable("id") int id) {
 
-		subscriptionService.deleteSubscription(id);
+		ResponseEntity<Object> responseEntity = subscriptionService.deleteSubscription(id);
 
-	}
-	
-	
-	@PutMapping("/activate/{id}")
-	public Subscription activateSubscription(@PathVariable("id") int id) {
-		
-		 Subscription subscription = subscriptionService.activateSubscription(id);
-		
-		return subscription;
+		return responseEntity;
 	}
 
+	@PutMapping("/update/{id}")
+	public ResponseEntity<Object> getActivateSubscription(@PathVariable("id") Integer id) {
+
+		ResponseEntity<Object> response = subscriptionService.activateSubscription(id);
+
+		return response;
+	}
 
 }
